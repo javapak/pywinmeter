@@ -16,49 +16,54 @@ from pyWinCoreAudio import (
     ON_SESSION_DISCONNECT,
     ON_SESSION_VOLUME_CHANGED,
 )
-
-import tkinter as tk
-from tkinter import ttk
-import sv_ttk
 from model import DevicesModel
 from view import View
-from PIL import Image
+import PySide6
+from PIL import ImageQt
 from pyWinCoreAudio import utils as utils
 import codecs 
-from PyQt6.QtWidgets import QApplication
+from PySide6 import QtWidgets
+
+
 import sys
 
 
 class Controller(object):
     model = DevicesModel()
-    view = View(tk.Tk())
+    app = QtWidgets.QApplication(sys.argv) 
+    view = View()
     
     def instantiate_endpoints(self): #testing purposes currently...
         self.provide_icons()
-        device_and_sessions_dict = self.provide_endpoints_and_sessions()
-        i = 0
-        for key in device_and_sessions_dict.keys():
-            print()
-            for value in device_and_sessions_dict.values():
-                if i < len(self.view.icons):
-                    self.view.session_slider_and_image(i, value[0])
-                    i += 1
-             
-                
-    
-    
-    def run(self):
-        self.instantiate_endpoints()
-        self.view.pack()
-        self.view.mainloop()
-
+        endpoint_list = self.model.endpoint_sess_obj()
         
-#Implementation of IMMNotificationClient and IAudioSessionEvents per the Microsoft docs. Need to make sure to unregister on close of the application or problems may arise. Glad I found this library. Much more robust and complete bindings and less confusing than Rust or C# bindings.
+        for endpoint in endpoint_list:
+            i = 0
+            print(endpoint.sessions)
+            self.view.endpoint_view(endpoint.name_id_list[0], endpoint.name_id_list[1], self.model.change_vol_end)
+
+            for sess in endpoint.sessions:
+                self.view.session_slider_view(sess[0], sess[1], self.model.change_vol_sess)
+                i += 1
+
+                
+            
+          
+                
+               
+
+    def run(self): 
+        self.instantiate_endpoints()
+        self.view.show()
+        self.app.exec()
+        
+        
+#Implementation of IMMNotificationClient and IAudioSessionEvents per the Microsoft docs. Need to make sure to unregister on close of the application or problems may arise. 
     def on_device_added(signal, device):
         print('Device added:', device.name)
 
 
-    _on_device_added = ON_DEVICE_ADDED.register(on_device_added) #method from library to register event callback methods.
+    _on_device_added = ON_DEVICE_ADDED.register(on_device_added) #method from library to register event callback methods. same follows down the lines for other on some condition....event driven.
 
 
     def on_device_removed(signal, name):
@@ -125,10 +130,7 @@ class Controller(object):
 
     def on_session_volume_changed(signal, device, endpoint, session, new_volume, new_mute):
         print('Session volume changed:', device.name + '.' + endpoint.name + '.' + session.name, 'volume:', new_volume, 'mute:', new_mute)
-        if new_volume <= 15.0:
-            print('setting session volume', session.volume.level)
-            session.volume.level = 50.0
-            print('new session volume =', session.volume.level)
+
 
 
     _on_session_volume_changed = ON_SESSION_VOLUME_CHANGED.register(on_session_volume_changed)
@@ -139,4 +141,6 @@ class Controller(object):
     
     def provide_icons(self):
         self.view.icons = self.model.icons
-Controller().run()
+        
+controller = Controller()
+controller.run()

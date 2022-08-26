@@ -84,6 +84,7 @@ def devices(message=True):
         _device_enumerator = IMMDeviceEnumerator()
 
     return _weakref.ref(_device_enumerator)
+    
 
 
 def stop():
