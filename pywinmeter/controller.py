@@ -32,7 +32,8 @@ class Controller(object):
     model = DevicesModel()
     app = QtWidgets.QApplication(sys.argv) 
     view = View()
-    
+
+
     def instantiate_endpoints(self): #testing purposes currently...
         self.provide_icons()
         endpoint_list = self.model.endpoint_sess_obj()
@@ -40,7 +41,7 @@ class Controller(object):
         for endpoint in endpoint_list:
             i = 0
             print(endpoint.sessions)
-            self.view.endpoint_view(endpoint.name_id_list[0], endpoint.name_id_list[1], self.model.change_vol_end)
+            self.view.endpoint_view(endpoint.name_id_list[0], endpoint.name_id_list[1], self.model.change_vol_end, self.model.change_bass_end, self.model.change_mid_end, self.model.change_treble_end)
 
             for sess in endpoint.sessions:
                 self.view.session_slider_view(sess[0], sess[1], self.model.change_vol_sess)

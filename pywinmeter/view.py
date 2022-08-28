@@ -31,6 +31,7 @@ Created on Fri Aug 19 14:04:13 2022
     #    ttk.Label(self, text = name).pack()
      #   ttk.Scale(self, from_=0, to_=100).pack()
 
+from cgitb import text
 import sys
 from PySide6 import QtWidgets
 from PySide6 import QtCore
@@ -51,7 +52,6 @@ class View(QtWidgets.QWidget):
         super(View, self).__init__(parent)
         self.setWindowFlag(QtCore.Qt.Window.FramelessWindowHint)
         self.setFixedSize(h, w)
-          
         self.scroll_panel = QtWidgets.QWidget()
         self.scroll_panel_layout = QtWidgets.QVBoxLayout(self.scroll_panel)
         self.scroll_area = QtWidgets.QScrollArea()
@@ -59,22 +59,56 @@ class View(QtWidgets.QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scroll_area.setWidget(self.scroll_panel)
+        geo = self.frameGeometry()
+        pos = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
+        geo.moveCenter(pos)
+        self.move(geo.bottomRight())
+
+
 
         # layout
         self.mainLayout = QtWidgets.QVBoxLayout(self)
         self.mainLayout.setContentsMargins(15,15,15,15)
         self.mainLayout.addWidget(self.scroll_area)
+
+    
         
 
         apply_stylesheet(self, theme='dark_red.xml')
     
-    def endpoint_view(self, endpoint_name, id, signal_func):
+
+
+    
+    def endpoint_view(self, endpoint_name, id, signal_func, bass, mid, treble):
+        layout = QtWidgets.QHBoxLayout()
         slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         label = QtWidgets.QLabel(text = "<b>" + endpoint_name + "</b>")
+        bassslid = QtWidgets.QSlider(QtCore.Qt.Vertical)
+        midslid = QtWidgets.QSlider(QtCore.Qt.Vertical)
+        trebleslid = QtWidgets.QSlider(QtCore.Qt.Vertical)
+        bassslid.setObjectName(id)
+        midslid.setObjectName(id)
+        trebleslid.setObjectName(id)
         slider.setObjectName(id)
-        self.scroll_panel_layout.addWidget(label)
+        bassslid.valueChanged.connect(lambda: bass(id, bassslid.value()))
+        midslid.valueChanged.connect(lambda: mid(id, midslid.value()))
+        trebleslid.valueChanged.connect(lambda: treble(id, trebleslid.value()))
+        bassslid.setMaximum(2147483647)
+        bassslid.setMinimum(-2147483648 )
+        trebleslid.setMaximum(2147483647)
+        trebleslid.setMinimum(-2147483648 )
+        midslid.setMaximum(2147483647)
+        midslid.setMinimum(-2147483648 )
+        eqLayout = QtWidgets.QHBoxLayout()
+        eqLayout.addWidget(bassslid)
+        eqLayout.addWidget(midslid)
+        eqLayout.addWidget(trebleslid)
+        layout.addWidget(label)
         slider.valueChanged.connect(lambda: signal_func(id, slider.value()))
+        self.scroll_panel_layout.addLayout(layout)
+        self.scroll_panel_layout.addLayout(eqLayout)
         self.scroll_panel_layout.addWidget(slider)
+
     
     
     def session_slider_view(self, key, id, signal_func): #add slider widgets to main window.

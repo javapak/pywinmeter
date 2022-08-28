@@ -1,3 +1,4 @@
+from ctypes.wintypes import LONG
 import pyWinCoreAudio
 import os
 from pyWinCoreAudio.mmdeviceapi import EDataFlow as data_flow
@@ -49,14 +50,14 @@ class DevicesModel(object):
         return self.endpoint_list
 
 
-    def change_vol_end(self, endpoint_id, vol): #This will need to be changed to use ID instead of name at some point.
+    def change_vol_end(self, endpoint_id, vol):
         for device in self.devices():
             for endpoint in device:
                 if endpoint.id == endpoint_id:
                     endpoint.volume.level = vol 
                     break
     
-    def change_vol_sess(self, session_id, vol): #This will need to be changed to use ID instead of name at some point, again....
+    def change_vol_sess(self, session_id, vol): 
         for device in self.devices():
             for endpoint in device:
                 if endpoint.data_flow == data_flow().eRender and endpoint.state == state_active:
@@ -64,6 +65,31 @@ class DevicesModel(object):
                         if session.id == session_id:
                             session.volume.level = vol 
                             break
+    
+    def change_bass_end(self, endpoint_id, level): 
+        for device in self.devices():
+            for endpoint in device:
+                if endpoint.id == endpoint_id:
+                    endpoint.bass = level
+                    break
+    
+    def change_mid_end(self, endpoint_id, level): 
+        for device in self.devices():
+            for endpoint in device:
+                if endpoint.id == endpoint_id:
+                    endpoint.mid = level 
+                    break
+    
+    
+    def change_treble_end(self, endpoint_id, level): 
+        for device in self.devices():
+            for endpoint in device:
+                if endpoint.id == endpoint_id:
+                    endpoint.treble = level
+    
+                    break
+
+        
     
 
     
