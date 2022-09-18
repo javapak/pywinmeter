@@ -154,7 +154,6 @@ ON_ENDPOINT_DEFAULT_CHANGED.register(on_endpoint_default_changed)
 
 
 def on_session_created(signal, device, endpoint, session): 
-    print('poop_sock')
     controller.model.process_paths_to_icons(session.process_id, session.name)
     controller.provide_icons()
     controller.view.on_session_create_show(session.name, endpoint.id, session.id, session.volume.level, controller.model.change_vol_sess, controller.model.mute)
@@ -184,7 +183,6 @@ def on_session_icon_changed(signal, device, endpoint, session, old_icon, new_ico
 ON_SESSION_ICON_CHANGED.register(on_session_icon_changed)
 
 def on_session_disconnect(signal, device, endpoint, name, reason):
-    print('disconnect poop')
     print('Session disconnected:', device.name + '.' + endpoint.name + '.' + name, reason)
 
     
