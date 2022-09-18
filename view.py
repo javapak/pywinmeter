@@ -90,10 +90,7 @@ class View(QtWidgets.QWidget, QtStyleTools):
         slider.setValue(volume)
         slider.valueChanged.connect(lambda: signal_func(endpoint_id, id, slider.value()))
         layout.addWidget(slider)
-        self.endpoint_sessions_vbox_dict[endpoint_id].addLayout(layout)
-        frame.show()
-        print('oi go fuck yourself i guess')
-        
+        self.endpoint_sessions_vbox_dict[endpoint_id].addLayout(layout)  
         self.update()
 
 
